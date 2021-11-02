@@ -19,19 +19,9 @@ async function postNewReview(req,res,next) {
     const {comment, rate, product_id} = req.body;
     const data = await pool.query("INSERT INTO reviews(comment, rate, product_id) VALUES($1, $2, $3) RETURNING *;", [
       comment, rate, product_id
-    ])
+    ]);
 
     res.send(data.rows[0]);
-  } catch (error) {
-    next(error);
-  }
-}
-
-
-async function deleteReviewById(req,res,next) {
-  try {
-    await pool.query("DELETE FROM reviews WHERE id=$1", [req.params.reviewId]);
-    res.status(204).send();
   } catch (error) {
     next(error);
   }
@@ -49,6 +39,17 @@ async function updateReviewById(req,res,next) {
     next(error);
   }
 }
+
+
+async function deleteReviewById(req,res,next) {
+  try {
+    await pool.query("DELETE FROM reviews WHERE id=$1", [req.params.reviewId]);
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+}
+
 
 const reviews = {
   getReviews, postNewReview, deleteReviewById, updateReviewById

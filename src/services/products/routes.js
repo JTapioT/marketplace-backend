@@ -1,6 +1,8 @@
 import express from "express";
 import products from "./handlers.js";
 import reviews from "../reviews/handlers.js";
+import uploadProductImageToCloud from "../../lib/imageHandler.js";
+
 
 const productsRouter = express.Router();
 
@@ -11,6 +13,9 @@ productsRouter.route("/:id")
 .get(products.getProductById)
 .put(products.updateProductById)
 .delete(products.deleteProductById)
+
+productsRouter.route("/:id/cover")
+.post(uploadProductImageToCloud, products.updateProductImageURL)
 
 productsRouter.route("/:id/reviews")
 .get(reviews.getReviews)

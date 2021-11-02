@@ -30,7 +30,6 @@ async function getProductById(req,res,next) {
 
 async function createNewProduct(req,res,next) {
   try {
-    console.log(req.body);
     const { name, description, brand, image_url, price, category } = req.body;
     const data = await pool.query(
       "INSERT INTO products(name,description,brand,image_url,price,category) VALUES($1,$2,$3,$4,$5,$6) RETURNING *;",
@@ -56,6 +55,18 @@ async function updateProductById(req,res,next) {
   }
 }
 
+// For handling the image upload and update of database information
+async function updateProductImageURL(req,res,next) {
+  try {
+    const image_url = req.file.path;
+    const data = await pool.query("UPDATE products SET image_url=$1 WHERE id=$2 RETURNING *;", [image_url, req.params.id]);
+
+    res.send(data.rows[0]);
+  } catch (error) {
+    
+  }
+}
+
 
 async function deleteProductById(req,res,next) {
   try {
@@ -68,7 +79,7 @@ async function deleteProductById(req,res,next) {
 
 
 const products = {
-  getAllProducts, getProductById, createNewProduct, updateProductById, deleteProductById
+  getAllProducts, getProductById, createNewProduct, updateProductById, deleteProductById, updateProductImageURL
 }
 
 export default products;
