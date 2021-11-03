@@ -1,12 +1,17 @@
-import pool from "../../db/connect.js";
+import models from "../../db/models/index.js";
+const { Review, Product } = models;
 
-async function getReviews(req,res,next) {
+
+async function getReviews(req, res, next) {
   try {
-    const data = await pool.query("SELECT * FROM reviews WHERE product_id=$1 ORDER BY id ASC;", [req.params.id]);
-    if(data.rows.length) {
-      res.send(data.rows);
+    const data = await Review.findAll({
+      include: Product,
+      order: [['id', 'ASC'], [{model: Product}, 'id', 'ASC']],
+    });
+    if(data.length) {
+      res.send(data);
     } else {
-      res.status(400).send("No reviews found");
+      res.status(400).send("No reviews to show.");
     }
   } catch (error) {
     next(error);
@@ -14,45 +19,65 @@ async function getReviews(req,res,next) {
 }
 
 
-async function postNewReview(req,res,next) {
+async function getReviewById(req,res,next) {
   try {
-    const {comment, rate, product_id} = req.body;
-    const data = await pool.query("INSERT INTO reviews(comment, rate, product_id) VALUES($1, $2, $3) RETURNING *;", [
-      comment, rate, product_id
-    ]);
-
-    res.send(data.rows[0]);
+    const reviewById = await Review.findByPk(req.params.id);
+    if(reviewById) {
+      res.send(reviewById);
+    } else {
+      res.status(400).send("No review found.");
+    }
   } catch (error) {
     next(error);
   }
 }
 
 
-async function updateReviewById(req,res,next) {
+async function postNewReview(req, res, next) {
   try {
-    const { comment, rate, product_id } = req.body;
-    const data = await pool.query("UPDATE reviews SET comment=$1, rate=$2, product_id=$3 WHERE id=$4 RETURNING *;", [
-      comment, rate, product_id, req.params.reviewId
-    ])
-    res.send(data.rows[0]);
+    const newReview = await Review.create(req.body);
+    res.send(newReview);
   } catch (error) {
     next(error);
   }
 }
 
 
-async function deleteReviewById(req,res,next) {
+async function updateReviewById(req, res, next) {
   try {
-    await pool.query("DELETE FROM reviews WHERE id=$1", [req.params.reviewId]);
+    const updatedReview = await Review.update(req.body, {
+      where: {
+        id: req.params.id,
+      },
+      returning: true,
+    });
+
+    res.send(updatedReview[1][0]);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function deleteReviewById(req, res, next) {
+  try {
+    await Review.destroy({
+      where: {
+        id: req.params.id
+      }
+    });
+
     res.status(204).send();
   } catch (error) {
     next(error);
   }
 }
 
-
 const reviews = {
-  getReviews, postNewReview, deleteReviewById, updateReviewById
-}
+  getReviews,
+  getReviewById,
+  postNewReview,
+  deleteReviewById,
+  updateReviewById,
+};
 
 export default reviews;
