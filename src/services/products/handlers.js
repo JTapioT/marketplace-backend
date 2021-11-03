@@ -63,7 +63,7 @@ async function updateProductImageURL(req,res,next) {
 
     res.send(data.rows[0]);
   } catch (error) {
-    
+    next(error);
   }
 }
 
