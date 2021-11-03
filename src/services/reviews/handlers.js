@@ -21,7 +21,9 @@ async function getReviews(req, res, next) {
 
 async function getReviewById(req,res,next) {
   try {
-    const reviewById = await Review.findByPk(req.params.id);
+    const reviewById = await Review.findByPk(req.params.id, {
+      include: Product,
+    });
     if(reviewById) {
       res.send(reviewById);
     } else {
