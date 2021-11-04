@@ -54,29 +54,36 @@ async function getProductById(req,res,next) {
   }
 }
 
-// TODO: Take later away the redundant console logs!!
+
 async function createNewProduct(req,res,next) {
   try {
+    // 
     // Get id from creating a new product
-    // Insert product category into category table - get id back
+    // Insert product category(s) into category table - get id(s) back
     // Insert to categoryProduct the productId and categoryId
 
     const {category, ...productInformation} = req.body;
     const newProduct = await Product.create(productInformation);
 
+    // If categories is an array eg. ['phone', 'electronics']
     if(Array.isArray(category) && category.length) {
-      // TODO: DO AFTER DEBRIEF!
-      // Insert into category, one by one
-      // With returned id's - similarly do the same to join table, one by one
+      let categories = category.map((categoryName) => {
+        return {name: categoryName}
+      });
+      let insertedRecordsToCategory = await Category.bulkCreate(categories);
+      let categoryIds = insertedRecordsToCategory.map(category => {
+        return {
+          productId: newProduct.id,
+          categoryId: category.dataValues.id
+        }
+      });
+      await ProductCategory.bulkCreate(categoryIds);
+    } else {
+    // Category comes as a string value eg. 'phone'
+      let insertedRecordToCategory = await Category.create({name: category});
+      await ProductCategory.create({productId: newProduct.id, categoryId: insertedRecordToCategory.id});
     }
-    const productToCategory = await Category.create({name: category});
-    console.log("Product id:");
-    console.log(newProduct.id);
-    console.log("Category id:");
-    console.log(productToCategory.id);
-    const addToJoinTable = await ProductCategory.create({productId: newProduct.id, categoryId: productToCategory.id});
-    console.log("Newly created information within productCategory table:");
-    console.log(addToJoinTable);
+
     res.send(newProduct);
   } catch (error) {
     console.log(error);
@@ -95,6 +102,7 @@ async function updateProductById(req,res,next) {
     })
     res.send(updatedProduct[1][0]);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }
@@ -111,6 +119,7 @@ async function updateProductImageURL(req,res,next) {
     });
     res.send(productAfterCoverUpdate[1][0]);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }
@@ -125,6 +134,7 @@ async function deleteProductById(req,res,next) {
     });
     res.status(204).send();
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }

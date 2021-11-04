@@ -10,7 +10,7 @@ const Category = sequelize.define("categories", {
   },
   name: {
     type: DataTypes.STRING,
-    unique: true, // right property to use? make sure later!
+    unique: true,
     allowNull: false,
   }
 });

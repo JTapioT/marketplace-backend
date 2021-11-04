@@ -12,7 +12,7 @@ const Product = sequelize.define("products", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
- /*  category: {
+  /* category: {
     type: DataTypes.STRING,
     allowNull: false,
   }, */

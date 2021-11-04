@@ -14,6 +14,7 @@ async function getReviews(req, res, next) {
       res.status(400).send("No reviews to show.");
     }
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }
@@ -30,6 +31,7 @@ async function getReviewById(req,res,next) {
       res.status(400).send("No review found.");
     }
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }
@@ -40,6 +42,7 @@ async function postNewReview(req, res, next) {
     const newReview = await Review.create(req.body);
     res.send(newReview);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }
@@ -56,6 +59,7 @@ async function updateReviewById(req, res, next) {
 
     res.send(updatedReview[1][0]);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }
@@ -70,6 +74,7 @@ async function deleteReviewById(req, res, next) {
 
     res.status(204).send();
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }
