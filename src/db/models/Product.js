@@ -5,28 +5,28 @@ const { DataTypes } = s;
 const Product = sequelize.define("products", {
   id: {
     primaryKey: true,
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
   },
   name: {
     type: DataTypes.TEXT,
     allowNull: false,
   },
-  category: {
+ /*  category: {
     type: DataTypes.STRING,
     allowNull: false,
-  },
+  }, */
   image: {
     type: DataTypes.STRING,
     allowNull: true,
     validate: {
       isUrl: true,
-    }
+    },
   },
   price: {
     type: DataTypes.FLOAT,
     allowNull: false,
-  }
+  },
 });
 
 export default Product;

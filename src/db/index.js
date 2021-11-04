@@ -1,4 +1,5 @@
-import { Sequelize } from "sequelize";
+import Sequelize from "sequelize";
+
 
 const { PGDATABASE, PGUSER, PGPASSWORD, PGHOST, PGPORT } = process.env;
 
@@ -17,5 +18,6 @@ export async function connectDB() {
     console.log(error);
   }
 }
+
 
 export default sequelize;
