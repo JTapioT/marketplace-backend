@@ -3,6 +3,7 @@ import Product from "./Product.js";
 import Review from "./Review.js";
 import Category from "./Category.js";
 import ProductCategory from "./ProductCategory.js";
+import ProductUser from "./ProductUser.js";
 
 // One-to-many relation
 // Review can belong only to one product. Product can have many reviews.
@@ -38,4 +39,12 @@ Category.belongsToMany(Product, {
   through: { model: ProductCategory, unique: false }
 })
 
-export default { Product, Review, Category, ProductCategory };
+
+Product.belongsToMany(User, {
+  through: { model: ProductUser, unique: false },
+});
+User.belongsToMany(Product, {
+  through: { model: ProductUser, unique: false },
+});
+
+export default { Product, Review, Category, User, ProductCategory, ProductUser };

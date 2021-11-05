@@ -1,18 +1,8 @@
-import models from "../../db/models/index.js";
-const { Review, Product } = models;
-
+import { getAllReviews, findOneReview, newReview, updateReview, deleteReview } from "../../db/controllers/review.controller.js";
 
 async function getReviews(req, res, next) {
   try {
-    const data = await Review.findAll({
-      include: Product,
-      order: [['id', 'ASC'], [{model: Product}, 'id', 'ASC']],
-    });
-    if(data.length) {
-      res.send(data);
-    } else {
-      res.status(400).send("No reviews to show.");
-    }
+    await getAllReviews(req,res);
   } catch (error) {
     console.log(error);
     next(error);
@@ -22,14 +12,7 @@ async function getReviews(req, res, next) {
 
 async function getReviewById(req,res,next) {
   try {
-    const reviewById = await Review.findByPk(req.params.id, {
-      include: Product,
-    });
-    if(reviewById) {
-      res.send(reviewById);
-    } else {
-      res.status(400).send("No review found.");
-    }
+    await findOneReview(req,res);
   } catch (error) {
     console.log(error);
     next(error);
@@ -39,8 +22,7 @@ async function getReviewById(req,res,next) {
 
 async function postNewReview(req, res, next) {
   try {
-    const newReview = await Review.create(req.body);
-    res.send(newReview);
+    await newReview(req,res);
   } catch (error) {
     console.log(error);
     next(error);
@@ -50,14 +32,7 @@ async function postNewReview(req, res, next) {
 
 async function updateReviewById(req, res, next) {
   try {
-    const updatedReview = await Review.update(req.body, {
-      where: {
-        id: req.params.id,
-      },
-      returning: true,
-    });
-
-    res.send(updatedReview[1][0]);
+    await updateReview(req,res);
   } catch (error) {
     console.log(error);
     next(error);
@@ -66,13 +41,7 @@ async function updateReviewById(req, res, next) {
 
 async function deleteReviewById(req, res, next) {
   try {
-    await Review.destroy({
-      where: {
-        id: req.params.id
-      }
-    });
-
-    res.status(204).send();
+    await deleteReview(req,res);
   } catch (error) {
     console.log(error);
     next(error);

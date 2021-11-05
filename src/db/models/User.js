@@ -14,10 +14,10 @@ const User = sequelize.define("users", {
   },
   email: {
     type: DataTypes.TEXT,
+    unique: true,
     allowNull: false,
     validate: {
       isEmail: true,
-      unique: true
     }
   }
 });
