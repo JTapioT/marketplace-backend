@@ -54,7 +54,8 @@ async function deleteProductFromCart(req,res) {
   try {
     await ProductUser.destroy({
       where: {
-        productId: req.body.productId
+        productId: req.body.productId,
+        userId: req.params.id
       }
     });
     res.status(204).send();
