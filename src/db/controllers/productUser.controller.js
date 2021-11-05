@@ -12,6 +12,7 @@ const { ProductUser, User, Product } = models;
 // I could be 100% wrong with the approach here but, well, try it now.
 
 // TODO: Change later what attributes to include!!
+// TODO: Think through the naming also of these functions as they are functions for database.
 
 async function getShoppingCart(req,res) {
   try {
