@@ -3,6 +3,9 @@ import Sequelize from "sequelize";
 
 const { PGDATABASE, PGUSER, PGPASSWORD, PGHOST, PGPORT } = process.env;
 
+// without rejectUnauthorized will cause error: self-signed certificate.
+// TODO: Learn more about SSL later.
+
 const sequelize = new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
   host: PGHOST,
   port: PGPORT,
