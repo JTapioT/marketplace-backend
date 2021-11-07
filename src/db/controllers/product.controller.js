@@ -9,26 +9,24 @@ const {Op} = sequelize;
 // I don't know much about Model-View-Controller approach but I guess the folder name 'controllers' would imply that this is where the process of modifying data suitable for database insert is handled. Also, response is being sent here.
 // I tried similar approach
 
+// Offset: Eg. size is 10 and offset 0, then product rows from 0-10 will be shown from all of the product rows.
+// If size is 20 and offset is 10, then products from 10-20 will be shown from all of the product rows. 
+// Hence, this way there is pagination available.
+// Limit: Limits the amount of products provided
+// Page amount is dependant on limit size. Eg. limit of 10 would mean out of 85 products in total that the page amount is 8.5. With Math.ceil() we top the amount of pages to 9 in total.
+
+
+
 export async function findAllProducts(req, res) {
   try {
-    const data = await Product.findAll({
-      ...(req.query.name || req.query.qt || req.query.lt && {where: {
-      ...(req.query.name && {name: {
-        [Op.iLike]: `%${req.query.name}%`
-      }}),
-      ...(req.query.gt || req.query.lt && {
-      price: {
-        ...(
-          (req.query.gt && {[Op.gt]: req.query.gt}) ||
-          (req.query.lt && {[Op.lt]: req.query.lt})
-        )
-      }})
-      }}),
+    const { count, rows } = await Product.findAndCountAll({
       include: [
         {
           model: Category,
           through: { model: ProductCategory, attributes: [] },
-          ...(req.query.category && {where: {name: {[Op.iLike]: `%${req.query.category}%`}}}),
+          ...(req.query.category && {
+            where: { name: { [Op.iLike]: `%${req.query.category}%` } },
+          }),
           attributes: { exclude: ["id", "updatedAt", "createdAt"] },
         },
         {
@@ -36,7 +34,9 @@ export async function findAllProducts(req, res) {
           include: [
             {
               model: User,
-              attributes: { exclude: ["id", "updatedAt", "createdAt", "email"] },
+              attributes: {
+                exclude: ["id", "updatedAt", "createdAt", "email"],
+              },
             },
           ],
           attributes: {
@@ -47,10 +47,23 @@ export async function findAllProducts(req, res) {
       attributes: {
         exclude: ["createdAt", "updatedAt"],
       },
-      order: [["createdAt", "ASC"]],
+      where: {
+        ...(req.query.name && {
+          name: {
+            [Op.iLike]: `%${req.query.name}%`,
+          },
+        }),
+        ...((req.query.gt || req.query.lt) && {price: {
+          ...((req.query.gt && { [Op.gt]: req.query.gt }) || {}),
+          ...((req.query.lt && { [Op.lt]: req.query.lt }) || {}),
+        }}),
+      },
+      limit: req.query.limit,
+      offset: req.query.page > 0 ? ((req.query.limit * req.query.page) - req.query.limit) : 0,
+      //order: [["createdAt", "ASC"]],
     });
-    if (data.length) {
-      res.send(data);
+    if (rows.length) {
+      res.send({total: count, pages: Math.ceil(count / req.query.limit)-1, data: rows});
     } else {
       res.status(400).send("No products to show.");
     }
