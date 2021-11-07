@@ -1,5 +1,5 @@
-import models from "../../db/models/index.js";
-const { ProductUser, Product, Category, ProductCategory } = models;
+import models from "../models/index.js";
+const { Product, Category, ProductCategory, Cart } = models;
 import sequelize from "sequelize";
 
 
@@ -15,13 +15,13 @@ import sequelize from "sequelize";
 // TODO: Can't understand why reference to table is eg. product.price, not products.price as the table name is 'products'. Confused.
 async function getShoppingCart(req,res) {
   try {
-    const cart = await ProductUser.findAll({
+    const cart = await Cart.findAll({
       where: {
         userId: req.params.id,
       },
       attributes: [
         "productId",
-        [sequelize.fn("COUNT", "productsUser.productId"), "unitary_qty"],
+        [sequelize.fn("COUNT", "cart.productId"), "unitary_qty"],
         [sequelize.fn("SUM", sequelize.col("product.price")), "unitary_price"],
       ],
       include: [
@@ -37,16 +37,16 @@ async function getShoppingCart(req,res) {
           ],
         },
       ],
-      group: ["productsUser.productId","productsUser.id", "product.id", "product.categories.id"],
+      group: ["cart.productId","cart.id", "product.id", "product.categories.id"],
     });
 
-  const totalQuantity = await ProductUser.count({
+  const totalQuantity = await Cart.count({
       where: {
         userId: req.params.id,
       },
     });
 
-    const totalPrice = await ProductUser.sum("product.price", {
+    const totalPrice = await Cart.sum("product.price", {
       include: {model: Product, attributes: [] },
     });
 
@@ -63,7 +63,7 @@ async function getShoppingCart(req,res) {
 
 async function addToShoppingCart(req,res) {
   try {
-    await ProductUser.create({
+    await Cart.create({
       userId: req.params.id, 
       productId: req.body.productId
     });
@@ -76,7 +76,7 @@ async function addToShoppingCart(req,res) {
 
 async function deleteProductFromCart(req,res) {
   try {
-    await ProductUser.destroy({
+    await Cart.destroy({
       where: {
         productId: req.body.productId,
         userId: req.params.id

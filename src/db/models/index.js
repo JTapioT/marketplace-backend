@@ -3,7 +3,7 @@ import Product from "./Product.js";
 import Review from "./Review.js";
 import Category from "./Category.js";
 import ProductCategory from "./ProductCategory.js";
-import ProductUser from "./ProductUser.js";
+import Cart from "./Cart.js";
 
 // One-to-many relation
 // Review can belong only to one product. Product can have many reviews.
@@ -41,16 +41,16 @@ Category.belongsToMany(Product, {
 
 
 Product.belongsToMany(User, {
-  through: { model: ProductUser, unique: false },
+  through: { model: Cart, unique: false },
 });
 User.belongsToMany(Product, {
-  through: { model: ProductUser, unique: false },
+  through: { model: Cart, unique: false },
 });
 
 // Super thanks to Tetiana for showing advanced Sequelize!
-Product.hasMany(ProductUser); // Product.findAll({include: ProductUser})
-ProductUser.belongsTo(Product); // ProductUser.findAll({include: Product})
-User.hasMany(ProductUser); // User.findAll({include: ProductUser})
-ProductUser.belongsTo(User); // ProductUser.findAll({include: User})
+Product.hasMany(Cart); // Product.findAll({include: ProductUser})
+Cart.belongsTo(Product); // ProductUser.findAll({include: Product})
+User.hasMany(Cart); // User.findAll({include: ProductUser})
+Cart.belongsTo(User); // ProductUser.findAll({include: User})
 
-export default { Product, Review, Category, User, ProductCategory, ProductUser };
+export default { Product, Review, Category, User, ProductCategory, Cart };

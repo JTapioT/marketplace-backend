@@ -25,7 +25,7 @@ console.log("Sequelize instance created.");
 
 export async function connectDB() {
   try {
-    await sequelize.sync({ alter: true, logging: false, raw: true });
+    await sequelize.sync({ alter: true, logging: false });
   } catch (error) {
     console.log(error);
   }

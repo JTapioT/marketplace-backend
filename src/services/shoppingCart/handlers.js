@@ -1,4 +1,4 @@
-import productUserController from "../../db/controllers/productUser.controller.js";
+import productUserController from "../../db/controllers/cart.controller.js";
 const {
   getShoppingCart, addToShoppingCart, deleteProductFromCart
 } = productUserController;
