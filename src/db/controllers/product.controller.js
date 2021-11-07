@@ -1,5 +1,8 @@
 import models from "../../db/models/index.js";
 const { Product, ProductCategory, Review, Category, User } = models;
+import sequelize from "sequelize";
+const {Op} = sequelize;
+
 
 // I tried to figure out how to separate the concerns even more and from this link
 // https://www.bezkoder.com/node-express-sequelize-postgresql/#Create_the_Controller
@@ -8,11 +11,24 @@ const { Product, ProductCategory, Review, Category, User } = models;
 
 export async function findAllProducts(req, res) {
   try {
-    const {count, rows} = await Product.findAndCountAll({
+    const data = await Product.findAll({
+      ...(req.query.name || req.query.qt || req.query.lt && {where: {
+      ...(req.query.name && {name: {
+        [Op.iLike]: `%${req.query.name}%`
+      }}),
+      ...(req.query.gt || req.query.lt && {
+      price: {
+        ...(
+          (req.query.gt && {[Op.gt]: req.query.gt}) ||
+          (req.query.lt && {[Op.lt]: req.query.lt})
+        )
+      }})
+      }}),
       include: [
         {
           model: Category,
           through: { model: ProductCategory, attributes: [] },
+          ...(req.query.category && {where: {name: {[Op.iLike]: `%${req.query.category}%`}}}),
           attributes: { exclude: ["id", "updatedAt", "createdAt"] },
         },
         {
@@ -33,8 +49,8 @@ export async function findAllProducts(req, res) {
       },
       order: [["createdAt", "ASC"]],
     });
-    if (rows.length) {
-      res.send({count: count, data: rows});
+    if (data.length) {
+      res.send(data);
     } else {
       res.status(400).send("No products to show.");
     }

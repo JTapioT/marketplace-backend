@@ -7,13 +7,18 @@ const sequelize = new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
   host: PGHOST,
   port: PGPORT,
   dialect: "postgres",
+  dialecOptions: {
+    ssl: {
+      require: false,
+    }
+  }
 });
 
 console.log("Sequelize instance created.");
 
 export async function connectDB() {
   try {
-    await sequelize.sync({ alter: true, logging: false });
+    await sequelize.sync({ alter: true, logging: false, raw: true });
   } catch (error) {
     console.log(error);
   }

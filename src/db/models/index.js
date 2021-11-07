@@ -47,4 +47,10 @@ User.belongsToMany(Product, {
   through: { model: ProductUser, unique: false },
 });
 
+// Super thanks to Tetiana for showing advanced Sequelize!
+Product.hasMany(ProductUser); // Product.findAll({include: ProductUser})
+ProductUser.belongsTo(Product); // ProductUser.findAll({include: Product})
+User.hasMany(ProductUser); // User.findAll({include: ProductUser})
+ProductUser.belongsTo(User); // ProductUser.findAll({include: User})
+
 export default { Product, Review, Category, User, ProductCategory, ProductUser };

@@ -1,5 +1,6 @@
 import models from "../../db/models/index.js";
-const { ProductUser, User, Product } = models;
+const { ProductUser, Product, Category, ProductCategory } = models;
+import sequelize from "sequelize";
 
 
 // Overall idea:
@@ -9,26 +10,48 @@ const { ProductUser, User, Product } = models;
 // with information about products and what user has it in the 
 // shopping cart
 
-// I could be 100% wrong with the approach here but, well, try it now.
 
-// TODO: Change later what attributes to include!!
-// TODO: Think through the naming also of these functions as they are functions for database.
-
+// FINALLY, IT WORKS!!
+// TODO: Can't understand why reference to table is eg. product.price, not products.price as the table name is 'products'. Confused.
 async function getShoppingCart(req,res) {
   try {
-    const {count, rows} = await User.findAndCountAll({
+    const cart = await ProductUser.findAll({
+      where: {
+        userId: req.params.id,
+      },
+      attributes: [
+        "productId",
+        [sequelize.fn("COUNT", "productsUser.productId"), "unitary_qty"],
+        [sequelize.fn("SUM", sequelize.col("product.price")), "unitary_price"],
+      ],
       include: [
         {
           model: Product,
-          through: {model: ProductUser}
-        }
+          attributes: ["name", "price"],
+          include: [
+            {
+              model: Category,
+              through: { model: ProductCategory, attributes: [] },
+              attributes: ["name"],
+            },
+          ],
+        },
       ],
-      where: {
-        id: req.params.id
-      }
+      group: ["productsUser.productId","productsUser.id", "product.id", "product.categories.id"],
     });
-    if(rows.length) {
-      res.send({count: count, data: rows})
+
+  const totalQuantity = await ProductUser.count({
+      where: {
+        userId: req.params.id,
+      },
+    });
+
+    const totalPrice = await ProductUser.sum("product.price", {
+      include: {model: Product, attributes: [] },
+    });
+
+    if(cart.length) {
+      res.send({totalQuantity, totalPrice, cart});
     } else {
       res.status(400).send("No products in the shopping cart.");
     }
