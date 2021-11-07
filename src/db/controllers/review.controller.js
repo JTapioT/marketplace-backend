@@ -1,6 +1,7 @@
 import models from "../../db/models/index.js";
 const { Review, Product } = models;
 import sequelize from "sequelize";
+import User from "../models/User.js";
 
 // I tried to figure out how to separate the concerns even more and from this link
 // https://www.bezkoder.com/node-express-sequelize-postgresql/#Create_the_Controller

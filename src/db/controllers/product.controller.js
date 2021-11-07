@@ -71,6 +71,7 @@ export async function findOneProduct(req, res) {
         },
         {
           model: Review,
+          include: [{model: User, attributes: {exclude:["id", "email", "createdAt", "updatedAt"]}}],
           attributes: {
             exclude: ["id", "createdAt", "updatedAt", "productId", "userId"],
           },
