@@ -7,7 +7,7 @@ const sequelize = new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
   host: PGHOST,
   port: PGPORT,
   dialect: "postgres",
-  dialecOptions: {
+  dialectOptions: {
     ssl: {
       require: false,
     }
