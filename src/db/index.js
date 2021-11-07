@@ -9,7 +9,8 @@ const sequelize = new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
   dialect: "postgres",
   dialectOptions: {
     ssl: {
-      require: false,
+      require: true,
+      rejectUnauthorized: false,
     }
   }
 });
